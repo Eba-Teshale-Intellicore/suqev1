@@ -9,11 +9,36 @@ import os
 DEBUG = False
 
 
-# Set this in your production environment.
-ALLOWED_HOSTS = os.getenv(
+# ============================================================
+# HOSTS
+# ============================================================
+
+DJANGO_ALLOWED_HOSTS = os.getenv(
     "DJANGO_ALLOWED_HOSTS",
-    "",
-).split(",")
+    "suqev1dev.onrender.com",
+)
+
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in DJANGO_ALLOWED_HOSTS.split(",")
+    if host.strip()
+]
+
+
+# ============================================================
+# CSRF
+# ============================================================
+
+DJANGO_CSRF_TRUSTED_ORIGINS = os.getenv(
+    "DJANGO_CSRF_TRUSTED_ORIGINS",
+    "https://suqev1dev.onrender.com",
+)
+
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in DJANGO_CSRF_TRUSTED_ORIGINS.split(",")
+    if origin.strip()
+]
 
 
 # ============================================================
@@ -30,13 +55,16 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 
 SECURE_HSTS_PRELOAD = True
 
+SECURE_PROXY_SSL_HEADER = (
+    "HTTP_X_FORWARDED_PROTO",
+    "https",
+)
+
 SESSION_COOKIE_SECURE = True
 
 CSRF_COOKIE_SECURE = True
 
 SECURE_SSL_REDIRECT = True
-
-
 # ============================================================
 # DATABASE
 # ============================================================
