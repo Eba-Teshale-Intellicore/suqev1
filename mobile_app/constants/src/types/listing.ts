@@ -51,40 +51,27 @@ export interface ListingMedia {
   created_at: string;
   updated_at: string;
 }
-
 export interface Listing {
   id: string;
-
   seller: ListingSeller;
-
   category: ListingCategory;
-
   title: string;
   description: string;
-
   price: string;
-
   currency: ListingCurrency;
-
   condition: ListingCondition;
-
   listing_type: ListingType;
-
+  phone_number: string;
   location: ListingLocation;
-
   status: string;
-
   view_count: number;
   likes_count: number;
   comments_count: number;
   shares_count: number;
   saves_count: number;
-
   is_featured: boolean;
   is_promoted: boolean;
-
   media: ListingMedia[];
-
   created_at: string;
   updated_at: string;
 }

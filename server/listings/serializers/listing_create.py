@@ -51,6 +51,7 @@ class ListingCreateSerializer(serializers.ModelSerializer):
             "currency_id",
             "condition_id",
             "listing_type_id",
+            "phone_number",
             "location_id",
         ]
 
@@ -75,4 +76,16 @@ class ListingCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 "Description cannot be empty."
             )
+        return value
+    def validate_phone_number(self, value):
+        value = value.strip()
+
+        if not value:
+            return ""
+
+        if len(value) > 20:
+            raise serializers.ValidationError(
+                "Phone number is too long."
+            )
+
         return value

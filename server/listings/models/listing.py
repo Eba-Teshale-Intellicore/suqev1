@@ -25,6 +25,7 @@ class Listing(BaseModel):
     currency = models.ForeignKey(Currency,on_delete=models.PROTECT,related_name="listings",)
     condition = models.ForeignKey(Condition,on_delete=models.PROTECT,related_name="listings",)
     listing_type = models.ForeignKey(ListingType,on_delete=models.PROTECT,related_name="listings",)
+    phone_number = models.CharField(max_length=20,blank=True,default="",)
     location = models.ForeignKey(Location,on_delete=models.PROTECT,related_name="listings",)
     status = models.CharField(max_length=20,choices=Status.choices,default=Status.ACTIVE,db_index=True,)
     view_count = models.PositiveIntegerField(

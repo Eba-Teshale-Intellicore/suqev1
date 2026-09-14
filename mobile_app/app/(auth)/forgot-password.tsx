@@ -1,4 +1,5 @@
 // app/(auth)/forgot-password.tsx
+
 import {
   View,
   Text,
@@ -41,10 +42,6 @@ export default function ForgotPassword() {
        * your backend password-reset request
        * endpoint.
        *
-       * Backend should generate a secure
-       * verification code/token and send it
-       * through your chosen verification channel.
-       *
        * Example future endpoint:
        *
        * POST /api/accounts/password/reset/request/
@@ -74,16 +71,30 @@ export default function ForgotPassword() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView
-        contentContainerStyle={styles.container}
-        keyboardShouldPersistTaps="handled"
-      >
-        <Pressable style={styles.backButton} onPress={() => router.back()}>
+      {/* ================================================== */}
+      {/* FIXED HEADER */}
+      {/* ================================================== */}
+
+      <View style={styles.fixedHeader}>
+        {/* BACK BUTTON */}
+
+        <Pressable
+          style={({ pressed }) => [
+            styles.backButton,
+            pressed && styles.backButtonPressed,
+          ]}
+          onPress={() => router.back()}
+          hitSlop={8}
+        >
           <Ionicons name="arrow-back" size={21} color={Colors.textPrimary} />
         </Pressable>
 
+        {/* HEADER */}
+
         <View style={styles.header}>
-          <Text style={styles.logo}>suqe</Text>
+          <View style={styles.logoContainer}>
+            <Text style={styles.logo}>suqe</Text>
+          </View>
 
           <Text style={styles.title}>Forgot password?</Text>
 
@@ -91,41 +102,108 @@ export default function ForgotPassword() {
             Enter the email address connected to your Suqe account.
           </Text>
         </View>
+      </View>
 
+      {/* ================================================== */}
+      {/* SCROLLABLE FORM */}
+      {/* ================================================== */}
+
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+        keyboardDismissMode="on-drag"
+      >
         <View style={styles.form}>
-          <View>
-            <Text style={styles.label}>Email</Text>
+          {/* EMAIL */}
 
-            <TextInput
-              style={styles.input}
-              value={email}
-              onChangeText={setEmail}
-              placeholder="you@example.com"
-              placeholderTextColor={Colors.textMuted}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
+          <View style={styles.field}>
+            <Text style={styles.label}>Email address</Text>
+
+            <View style={styles.inputContainer}>
+              <Ionicons
+                name="mail-outline"
+                size={20}
+                color={Colors.textMuted}
+                style={styles.inputIcon}
+              />
+
+              <TextInput
+                style={styles.input}
+                value={email}
+                onChangeText={setEmail}
+                placeholder="you@example.com"
+                placeholderTextColor={Colors.textMuted}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+                autoComplete="email"
+                textContentType="emailAddress"
+                returnKeyType="done"
+                onSubmitEditing={handleContinue}
+              />
+            </View>
           </View>
 
+          {/* CONTINUE */}
+
           <Pressable
-            style={[styles.primaryButton, loading && styles.disabledButton]}
+            style={({ pressed }) => [
+              styles.primaryButton,
+              loading && styles.disabledButton,
+              pressed && !loading && styles.primaryButtonPressed,
+            ]}
             onPress={handleContinue}
             disabled={loading}
           >
             {loading ? (
-              <ActivityIndicator color={Colors.white} />
+              <View style={styles.loadingContent}>
+                <ActivityIndicator color={Colors.white} size="small" />
+
+                <Text style={styles.primaryButtonText}>Continuing...</Text>
+              </View>
             ) : (
-              <Text style={styles.primaryButtonText}>Continue</Text>
+              <>
+                <Text style={styles.primaryButtonText}>Continue</Text>
+
+                <Ionicons name="arrow-forward" size={19} color={Colors.white} />
+              </>
             )}
           </Pressable>
 
+          {/* BACK TO LOGIN */}
+
           <Pressable
-            style={styles.loginButton}
+            style={({ pressed }) => [
+              styles.loginButton,
+              pressed && styles.loginButtonPressed,
+            ]}
             onPress={() => router.replace("/(auth)/login")}
+            hitSlop={8}
           >
+            <Ionicons
+              name="arrow-back-outline"
+              size={17}
+              color={Colors.primary}
+            />
+
             <Text style={styles.link}>Back to login</Text>
           </Pressable>
+
+          {/* SECURITY FOOTER */}
+
+          <View style={styles.footer}>
+            <Ionicons
+              name="shield-checkmark-outline"
+              size={17}
+              color={Colors.verified}
+            />
+
+            <Text style={styles.footerText}>
+              Your information is kept secure.
+            </Text>
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -133,108 +211,203 @@ export default function ForgotPassword() {
 }
 
 const styles = StyleSheet.create({
+  // ==================================================
+  // SCREEN
+  // ==================================================
+
   safeArea: {
     flex: 1,
     backgroundColor: Colors.background,
   },
 
-  container: {
-    flexGrow: 1,
+  // ==================================================
+  // FIXED HEADER
+  // ==================================================
+
+  fixedHeader: {
     paddingHorizontal: 20,
-    paddingTop: 8,
-    paddingBottom: 32,
+    paddingTop: 12,
+    backgroundColor: Colors.background,
   },
 
   backButton: {
     width: 44,
     height: 44,
-    borderRadius: Radius.md,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: Radius.circle,
     backgroundColor: Colors.surface,
     borderWidth: 1,
     borderColor: Colors.borderLight,
-    alignItems: "center",
-    justifyContent: "center",
+  },
+
+  backButtonPressed: {
+    backgroundColor: Colors.secondaryLight,
+    transform: [{ scale: 0.97 }],
   },
 
   header: {
-    marginTop: 28,
-    marginBottom: 28,
+    marginTop: 30,
+    paddingBottom: 26,
+  },
+
+  logoContainer: {
+    marginBottom: 18,
   },
 
   logo: {
-    ...Typography.h2,
+    fontSize: 32,
+    lineHeight: 38,
+    fontWeight: "800",
     color: Colors.primary,
-    marginBottom: 18,
+    letterSpacing: -1.4,
   },
 
   title: {
     ...Typography.h1,
+    fontSize: 30,
+    lineHeight: 37,
     color: Colors.textPrimary,
+    letterSpacing: -0.5,
   },
 
   subtitle: {
     ...Typography.bodyLarge,
     color: Colors.textSecondary,
-    marginTop: 10,
-    maxWidth: 360,
+    marginTop: 9,
+    lineHeight: 23,
+    maxWidth: 350,
   },
 
+  // ==================================================
+  // SCROLL
+  // ==================================================
+
+  scroll: {
+    flex: 1,
+  },
+
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingTop: 6,
+    paddingBottom: 40,
+  },
+
+  // ==================================================
+  // FORM
+  // ==================================================
+
   form: {
-    gap: 16,
+    gap: 18,
+  },
+
+  field: {
+    width: "100%",
   },
 
   label: {
     ...Typography.label,
     color: Colors.textPrimary,
-    marginBottom: 7,
+    marginBottom: 8,
   },
 
-  input: {
-    height: 52,
+  inputContainer: {
+    height: 54,
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: Colors.surface,
     borderWidth: 1,
     borderColor: Colors.border,
-    borderRadius: Radius.md,
+    borderRadius: Radius.lg,
     paddingHorizontal: 14,
-    color: Colors.textPrimary,
-    ...Typography.bodyLarge,
   },
 
+  inputIcon: {
+    marginRight: 10,
+  },
+
+  input: {
+    ...Typography.bodyLarge,
+    flex: 1,
+    color: Colors.textPrimary,
+    paddingVertical: 0,
+  },
+
+  // ==================================================
+  // PRIMARY BUTTON
+  // ==================================================
+
   primaryButton: {
-    height: 54,
-    borderRadius: Radius.md,
-    backgroundColor: Colors.buttonPrimary,
+    height: 56,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    gap: 9,
     marginTop: 4,
-    elevation: 2,
-    shadowColor: Colors.black,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.12,
-    shadowRadius: 4,
+    borderRadius: Radius.lg,
+    backgroundColor: Colors.buttonPrimary,
+  },
+
+  primaryButtonPressed: {
+    backgroundColor: Colors.buttonPrimaryPressed,
+    transform: [{ scale: 0.985 }],
   },
 
   disabledButton: {
-    opacity: 0.55,
+    opacity: 0.65,
   },
 
   primaryButtonText: {
     ...Typography.button,
+    fontSize: 15,
+    fontWeight: "700",
     color: Colors.white,
   },
 
+  loadingContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 9,
+  },
+
+  // ==================================================
+  // BACK TO LOGIN
+  // ==================================================
+
   loginButton: {
+    minHeight: 44,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    minHeight: 44,
+    gap: 6,
     paddingVertical: 8,
   },
 
+  loginButtonPressed: {
+    opacity: 0.7,
+  },
+
   link: {
-    ...Typography.button,
+    ...Typography.bodyMedium,
     color: Colors.primary,
+    fontWeight: "700",
+  },
+
+  // ==================================================
+  // FOOTER
+  // ==================================================
+
+  footer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 14,
+    paddingHorizontal: 10,
+  },
+
+  footerText: {
+    ...Typography.caption,
+    color: Colors.textMuted,
+    marginLeft: 7,
   },
 });

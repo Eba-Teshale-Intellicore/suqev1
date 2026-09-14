@@ -56,6 +56,7 @@ class ListingUpdateSerializer(serializers.ModelSerializer):
             "currency_id",
             "condition_id",
             "listing_type_id",
+            "phone_number",
             "location_id",
         ]
 
@@ -67,6 +68,9 @@ class ListingUpdateSerializer(serializers.ModelSerializer):
                 "required": False,
             },
             "price": {
+                "required": False,
+            },
+            "phone_number": {
                 "required": False,
             },
         }
@@ -92,4 +96,16 @@ class ListingUpdateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 "Price cannot be negative."
             )
+        return value
+    def validate_phone_number(self, value):
+        value = value.strip()
+
+        if not value:
+            return ""
+
+        if len(value) > 20:
+            raise serializers.ValidationError(
+                "Phone number is too long."
+            )
+
         return value

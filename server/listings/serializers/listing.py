@@ -82,6 +82,7 @@ class ListingSerializer(serializers.ModelSerializer):
             "currency",
             "condition",
             "listing_type",
+            "phone_number",
             "location",
             "status",
             "view_count",
