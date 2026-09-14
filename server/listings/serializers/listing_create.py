@@ -1,0 +1,78 @@
+from rest_framework import serializers
+
+from categories.models import Category
+from conditions.models import Condition
+from currencies.models import Currency
+from listing_types.models import ListingType
+from locations.models import Location
+from listings.models import Listing
+
+
+class ListingCreateSerializer(serializers.ModelSerializer):
+
+    category_id = serializers.PrimaryKeyRelatedField(
+        source="category",
+        queryset=Category.objects.filter(is_active=True),
+        write_only=True,
+    )
+
+    condition_id = serializers.PrimaryKeyRelatedField(
+        source="condition",
+        queryset=Condition.objects.filter(is_active=True),
+        write_only=True,
+    )
+
+    listing_type_id = serializers.PrimaryKeyRelatedField(
+        source="listing_type",
+        queryset=ListingType.objects.filter(is_active=True),
+        write_only=True,
+    )
+
+    location_id = serializers.PrimaryKeyRelatedField(
+        source="location",
+        queryset=Location.objects.filter(is_active=True),
+        write_only=True,
+    )
+
+    currency_id = serializers.PrimaryKeyRelatedField(
+        source="currency",
+        queryset=Currency.objects.filter(is_active=True),
+        write_only=True,
+    )
+
+    class Meta:
+        model = Listing
+
+        fields = [
+            "category_id",
+            "title",
+            "description",
+            "price",
+            "currency_id",
+            "condition_id",
+            "listing_type_id",
+            "location_id",
+        ]
+
+    def validate_title(self, value):
+        value = value.strip()
+        if not value:
+            raise serializers.ValidationError(
+                "Title cannot be empty."
+            )
+        return value
+
+    def validate_price(self, value):
+        if value < 0:
+            raise serializers.ValidationError(
+                "Price cannot be negative."
+            )
+        return value
+
+    def validate_description(self, value):
+        value = value.strip()
+        if not value:
+            raise serializers.ValidationError(
+                "Description cannot be empty."
+            )
+        return value
