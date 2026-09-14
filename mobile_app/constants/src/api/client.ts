@@ -3,7 +3,8 @@ import axios from "axios";
 import { getAccessToken } from "@/constants/src/auth/storage";
 
 export const api = axios.create({
-  baseURL: "http://192.168.0.127:8000",
+  // baseURL: "http://192.168.0.127:8000",
+  baseURL: process.env.EXPO_PUBLIC_API_URL,
   headers: {
     "Content-Type": "application/json",
   },
