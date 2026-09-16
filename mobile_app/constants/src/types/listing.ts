@@ -44,8 +44,13 @@ export interface ListingMedia {
   id: string;
   listing: string;
   media_type: "image" | "video" | string;
+
   url: string | null;
+
+  feed_url: string | null;
+
   thumbnail_url: string | null;
+
   position: number;
   is_cover: boolean;
   created_at: string;

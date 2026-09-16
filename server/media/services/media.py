@@ -37,6 +37,7 @@ def create_media(
             listing=listing,
             media_type=media_type,
             url=uploaded["url"],
+            feed_url=uploaded["feed_url"],
             public_id=uploaded["public_id"],
             thumbnail_url=uploaded["thumbnail_url"],
             position=position,
@@ -56,7 +57,6 @@ def create_media(
                 pass
 
         raise
-
 
 @transaction.atomic
 def delete_media_object(*, user, media):

@@ -12,6 +12,7 @@ class Media(BaseModel):
 
     listing = models.ForeignKey(Listing,on_delete=models.CASCADE,related_name="media",)
     media_type = models.CharField(max_length=10,choices=MediaType.choices,)
+    feed_url = models.URLField(blank=True, default="")
     url = models.URLField()
     public_id = models.CharField(max_length=500,)
     thumbnail_url = models.URLField(blank=True,default="",)

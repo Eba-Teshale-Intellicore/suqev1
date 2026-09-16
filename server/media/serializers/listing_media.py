@@ -5,7 +5,6 @@ from listings.models import Listing
 
 
 class MediaSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Media
         fields = [
@@ -13,20 +12,22 @@ class MediaSerializer(serializers.ModelSerializer):
             "listing",
             "media_type",
             "url",
+            "feed_url",
             "thumbnail_url",
             "position",
             "is_cover",
             "created_at",
             "updated_at",
         ]
+
         read_only_fields = [
             "id",
             "url",
+            "feed_url",
             "thumbnail_url",
             "created_at",
             "updated_at",
         ]
-
 
 class MediaCreateSerializer(serializers.ModelSerializer):
     listing_id = serializers.PrimaryKeyRelatedField(
