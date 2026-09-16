@@ -13,6 +13,7 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 
 from listings.filters import ListingFilter
 from listings.models import Listing
+from listings.pagination import ListingFeedPagination
 from listings.serializers.listing import ListingSerializer
 from listings.serializers.listing_create import ListingCreateSerializer
 from listings.serializers.listing_update import ListingUpdateSerializer
@@ -48,13 +49,28 @@ class ListingViewSet(ModelViewSet):
 
     ordering = ["-created_at"]
 
+    # =====================================================
+    # PAGINATION
+    # =====================================================
+
+    pagination_class = ListingFeedPagination
+
+    # =====================================================
+    # PERMISSIONS
+    # =====================================================
+
     def get_permissions(self):
         if self.action in ["list", "retrieve"]:
             return [AllowAny()]
 
         return [IsAuthenticated()]
 
+    # =====================================================
+    # QUERYSET
+    # =====================================================
+
     def get_queryset(self):
+
         queryset = (
             Listing.objects
             .select_related(
@@ -70,8 +86,16 @@ class ListingViewSet(ModelViewSet):
 
         user = self.request.user
 
+        # =================================================
+        # STAFF
+        # =================================================
+
         if user.is_authenticated and user.is_staff:
             return queryset
+
+        # =================================================
+        # DETAIL / UPDATE / DELETE
+        # =================================================
 
         if self.action in [
             "retrieve",
@@ -79,6 +103,7 @@ class ListingViewSet(ModelViewSet):
             "partial_update",
             "destroy",
         ]:
+
             if user.is_authenticated:
                 return queryset.filter(
                     Q(status=Listing.Status.ACTIVE)
@@ -89,20 +114,37 @@ class ListingViewSet(ModelViewSet):
                 status=Listing.Status.ACTIVE
             )
 
+        # =================================================
+        # FEED
+        # =================================================
+
         return queryset.filter(
             status=Listing.Status.ACTIVE
         )
 
+    # =====================================================
+    # SERIALIZER
+    # =====================================================
+
     def get_serializer_class(self):
+
         if self.action == "create":
             return ListingCreateSerializer
 
-        if self.action in ["update", "partial_update"]:
+        if self.action in [
+            "update",
+            "partial_update",
+        ]:
             return ListingUpdateSerializer
 
         return ListingSerializer
 
+    # =====================================================
+    # CREATE
+    # =====================================================
+
     def create(self, request, *args, **kwargs):
+
         serializer = self.get_serializer(
             data=request.data
         )
@@ -127,20 +169,35 @@ class ListingViewSet(ModelViewSet):
             status=status.HTTP_201_CREATED,
         )
 
+    # =====================================================
+    # CREATE SERVICE
+    # =====================================================
+
     def perform_create(self, serializer):
+
         serializer.instance = create_listing(
             user=self.request.user,
             validated_data=serializer.validated_data,
         )
 
+    # =====================================================
+    # UPDATE
+    # =====================================================
+
     def perform_update(self, serializer):
+
         update_listing(
             user=self.request.user,
             listing=serializer.instance,
             validated_data=serializer.validated_data,
         )
 
+    # =====================================================
+    # DELETE
+    # =====================================================
+
     def destroy(self, request, *args, **kwargs):
+
         listing = self.get_object()
 
         delete_listing(

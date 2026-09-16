@@ -4764,6 +4764,9 @@ function VideoMedia({
     />
   );
 }
+const VIEWABILITY_CONFIG = {
+  itemVisiblePercentThreshold: 70,
+};
 
 // =====================================================
 // HOME SCREEN
@@ -4795,13 +4798,18 @@ export default function HomeScreen() {
   // ===================================================
 
   const {
-    data: listings = [],
+    data,
     isLoading,
     isError,
     error,
     refetch,
     isFetching,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
   } = useListings();
+
+  const listings = data?.pages.flatMap((page) => page.results) ?? [];
 
   // ===================================================
   // LOCAL UI STATE
@@ -4816,6 +4824,32 @@ export default function HomeScreen() {
   const [isMuted, setIsMuted] = useState(true);
 
   const [isPaused, setIsPaused] = useState(false);
+
+  const handleViewableItemsChanged = useCallback(
+    ({ viewableItems }: any) => {
+      const currentItem = viewableItems?.[0];
+
+      if (!currentItem) {
+        return;
+      }
+
+      const index = currentItem.index ?? 0;
+
+      setActiveIndex(index);
+      setIsPaused(false);
+
+      // ================================================
+      // PREFETCH NEXT PAGE
+      // ================================================
+
+      const remainingItems = listings.length - index - 1;
+
+      if (remainingItems <= 5 && hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
+      }
+    },
+    [listings.length, hasNextPage, isFetchingNextPage, fetchNextPage],
+  );
 
   // ===================================================
   // FILTER
@@ -5318,6 +5352,9 @@ export default function HomeScreen() {
           initialNumToRender={2}
           maxToRenderPerBatch={2}
           windowSize={3}
+          viewabilityConfig={VIEWABILITY_CONFIG}
+          onViewableItemsChanged={handleViewableItemsChanged}
+          onEndReachedThreshold={0.5}
           onMomentumScrollEnd={(event) => {
             const index = Math.round(
               event.nativeEvent.contentOffset.y / height,
@@ -5326,6 +5363,19 @@ export default function HomeScreen() {
             setActiveIndex(index);
             setIsPaused(false);
           }}
+          ListFooterComponent={
+            isFetchingNextPage ? (
+              <View
+                style={{
+                  height: 80,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <ActivityIndicator size="small" color={Colors.primary} />
+              </View>
+            ) : null
+          }
         />
       )}
     </View>

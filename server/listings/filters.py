@@ -9,9 +9,12 @@ class ListingFilter(django_filters.FilterSet):
         field_name="category_id",
     )
 
-    condition = django_filters.UUIDFilter(
-        field_name="condition_id",
-    )
+    # condition = django_filters.UUIDFilter(
+    #     field_name="condition_id",
+    # )
+    condition = django_filters.CharFilter(
+    field_name="condition__slug",
+)
 
     listing_type = django_filters.UUIDFilter(
         field_name="listing_type_id",

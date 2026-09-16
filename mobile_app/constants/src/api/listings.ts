@@ -6,18 +6,50 @@
 
 //   return response.data;
 // }
+// constants/src/api/listings.ts
+
 import { api } from "./client";
 import type { Listing } from "@/constants/src/types/listing";
 
-export async function getListings(): Promise<Listing[]> {
+// =====================================================
+// TYPES
+// =====================================================
+
+export type ListingFilter = "all" | "new" | "used";
+
+export interface PaginatedListings {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: Listing[];
+}
+
+// =====================================================
+// GET LISTINGS
+// =====================================================
+
+export async function getListings(
+  page: number = 1,
+  filter: ListingFilter = "all",
+): Promise<PaginatedListings> {
   try {
-    const response = await api.get("/api/v1/listings/");
+    const response = await api.get<PaginatedListings>("/api/v1/listings/", {
+      params: {
+        page,
+        page_size: 10,
+        ...(filter !== "all" && {
+          condition: filter,
+        }),
+      },
+    });
 
     console.log("================================");
+    console.log("LISTINGS PAGE:", page);
+    console.log("LISTINGS FILTER:", filter);
     console.log("API STATUS:", response.status);
-    console.log("API DATA:", response.data);
-    console.log("API DATA TYPE:", typeof response.data);
-    console.log("API DATA IS ARRAY:", Array.isArray(response.data));
+    console.log("LISTINGS RECEIVED:", response.data.results.length);
+    console.log("TOTAL LISTINGS:", response.data.count);
+    console.log("HAS NEXT PAGE:", !!response.data.next);
     console.log("================================");
 
     return response.data;
@@ -29,6 +61,10 @@ export async function getListings(): Promise<Listing[]> {
     throw error;
   }
 }
+
+// =====================================================
+// CREATE LISTING
+// =====================================================
 
 export interface CreateListingPayload {
   title: string;
